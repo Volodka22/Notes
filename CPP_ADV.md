@@ -1,5 +1,5 @@
 # C++ advanced
-## rvalue-reference, move semanics
+## rvalue-reference
 ```
   mytype g() {
     return mytype();
@@ -39,6 +39,44 @@ void g(mytype* result) {
 mytype g() {
   mytype a;
   mytype b;
-  return (rand % 2) ? a : b;
+  return (rand() % 2) ? a : b;
 }
+```
+### move semanics
+```
+int a;
+
+int& b = 42;  // error
+int& c = a;   // ok
+
+int&& d = a;  // error
+int&& e = 42; // ok
+
+int&& m = std::move(a); // ok
+
+int&& q = m; // error - именованные ссылки всегда lvalue
+```
+### x-value
+```
+mytype prvalue();
+mytype& lvalue();
+mytype&& xvalue();
+
+void foo(mytype const&);
+void foo(mytype&&);
+
+mytype test() {
+  foo(prvalue()); // mytype&&
+  foo(lvalue());  // mytype const&
+  foo(xvalue());  // mytype&&
+  
+  return prvalue(); // RVO
+  return lvalue();  // no-RVO
+  return xvalue();  // no-RVO
+}
+```
+
+Передача rvalue в конструктор, компилятором не читается:
+```
+mytype x = mytype(prvalue()); // не вызывает лишний раз конструктор
 ```
