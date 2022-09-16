@@ -42,7 +42,7 @@ mytype g() {
   return (rand() % 2) ? a : b;
 }
 ```
-### move semanics
+## move semanics
 ```
 int a;
 
@@ -56,7 +56,7 @@ int&& m = std::move(a); // ok
 
 int&& q = m; // error - именованные ссылки всегда lvalue
 ```
-### x-value
+## x-value
 ```
 mytype prvalue();
 mytype& lvalue();
@@ -79,4 +79,23 @@ mytype test() {
 Передача rvalue в конструктор, компилятором не читается:
 ```
 mytype x = mytype(prvalue()); // не вызывает лишний раз конструктор
+```
+## intrusive контейнеры
+Чтобы не плодить next-prev'ы и не выделять доп памяти под ноды
+```
+tepmlate <typename Tag>
+struct list_element {
+  list_element* prev;
+  list_element* next;
+}
+
+struct unit 
+  : list_element<struct all_units_tag>,
+    list_element<struct selected_units_tag> 
+{   
+}
+
+intrusive_list<unit, all_units_tag> all_units;
+intrusive_list<unit, selected_units_tag> selected_units;
+
 ```
