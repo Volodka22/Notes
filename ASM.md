@@ -185,6 +185,97 @@ NOP (xchg eax, eax)
 
 UD2 - гарантированно несуществующая команда
 
+## Написание программы
 
-TODO: поставить nasm, и 32 битную подсистему
+### Секции
 
+код - можно исполнять
+дата - можно только читать
+
+### стартовый код
+
+```
+  section .text
+  global main; делаем main видимым оттовсюду
+
+main:
+  ret
+```
+
+Если точка входа - не main, то ее стоит передать линкеру
+
+### Hello, world :)
+
+```
+  section .text
+  global main ; делаем main видимым оттовсюду
+  extern printf
+
+main:
+    push hello
+    call printf
+    add esp, 4
+  
+    ret
+
+  section .rdata
+hello: db "Hello", 0
+```
+
+db - дальше пойдут байтики, но без 0 - терменированной строчка не будет :(
+
+### Конвенции
+
+*Хотим f(a, b, c):*
+
+**cdecl:**
+```
+push c
+push b
+push a
+call f
+add esp, 12
+
+f:
+  mov eax, [esp + 4] ; по esp лежит код возврата
+  add eax, [esp + 8]
+  ret
+```
+
+для возвращения используют eax и edx (как продолжение eax)
+
+**stdcall:** 
+```
+push c
+push b
+push a
+call f
+
+f:
+  mov eax, [esp + 4] ; по esp лежит код возврата
+  add eax, [esp + 8]
+  ret 12
+```
+Минус - не умеет работать с vararg :(
+Плюс - меньше кода
+
+**pascal:**
+
+```
+push a
+push b
+push c
+call f
+
+f:
+  mov eax, [esp + 4] ; по esp лежит код возврата
+  add eax, [esp + 8]
+  ret 12
+```
+В случае vararg - не можем найти начало. Одни минусы. Конвенция мертва.
+
+**fastcall**
+передавать аргументы через регистры
+
+Сохраняемые регистры: ebx, ebp, esi, edi
+Несохраняемые регистры: eax, ecx, edx. 
