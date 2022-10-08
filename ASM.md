@@ -279,3 +279,98 @@ f:
 
 Сохраняемые регистры: ebx, ebp, esi, edi
 Несохраняемые регистры: eax, ecx, edx. 
+
+## Условия
+
+```
+cmp eax, ebx
+J...  L1 ; хотим сравнить знаково/беззнаково
+X
+L1:
+...
+```
+
+### Беззнаковые
+A, B, AE, BE; больше, меньше, больше равно, меньше равно
+NA, NBE, ... ; их отрицания
+
+if(eax < ebx && ecx != 0) :
+```
+cmp eax, ebx
+jae L1
+test ecx, ecx
+jz L1
+X
+L1:
+...
+```
+### Знаковые
+G,L,GE,LE;
+Также есть отрицания
+
+## Циклы
+
+### do while
+Хотим:
+```
+do
+  x;
+while(eax < ebx)
+```
+Пишем:
+```
+L1:
+  X
+  cmp eax, ebx
+  jb L1
+```
+### while
+Хотим:
+```
+while(eax < ebx)
+  X;
+```
+Пишем:
+```
+L1:
+  cmp eax, ebx
+  jae L2
+  X
+  jmp L1
+L2:
+```
+
+**ОДНАКО** лучше хотеть 
+```
+if
+do
+while;
+```
+Поэтому
+```
+  cmp eax, ebx
+  jae L2
+L1:
+  X
+  cmp eax, ebx
+  jb L1
+L2:
+```
+
+### for
+```
+for (uint eax = 0; eax < ebx; eax++)
+  X;
+```
+Форматируем в do while:
+```
+  xor eax, eax
+  cmp eax, ebx
+  jnb L2
+L1:
+  X
+  inc eax
+  cmp eax, ebx
+  jb L1
+L2:
+```
