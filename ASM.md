@@ -365,12 +365,26 @@ for (uint eax = 0; eax < ebx; eax++)
 Форматируем в do while:
 ```
   xor eax, eax
-  cmp eax, ebx
-  jnb L2
+  cmp eax, ebx;
+  jnb L2; последние две команды можно выгнать 
 L1:
   X
   inc eax
   cmp eax, ebx
   jb L1
 L2:
+```
+
+Оптимальней будет развернуть цикл
+```
+for(uint eax=ebx; eax--;)
+  X;
+```
+Пишем:
+```
+  lea eax, [ebx-1]
+L1:
+  X
+  sub eax, 1
+  jnc L1
 ```
