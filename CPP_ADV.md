@@ -266,3 +266,39 @@ std::shared_ptr<object> cache::alloc(int value)
       }
   }
 ```
+
+## perfect forwarding
+
+```
+using type1 = int&;
+usint type2 = type1&;
+static_assert(std::is_same_v<type1, int&>);
+```
+& & -> & (ссылка на ссылку == ссылка)
+&& & -> &
+& && -> &
+&& && -> &&
+lvalue всегда выигрывает.
+
+```
+/* f с несколькими перегрузками */
+
+template<typename T>
+void g(T&& x) {
+  f(forward<T>(x)); // тоже что и static_cast<T&&>(x);
+}
+
+int main() {
+  g(42); // T -> int
+  int x = 43;
+  g(x); // T -> int&; а как известно применение && к int& - это int& 
+}
+```
+
+```
+template<typname.. T>
+void f(T... args) {
+  g(z(args...)); // g(z(arg0, arg1...)
+  g(z(args)....); // g(z(arg0), z(arg1), ...)
+}
+```
