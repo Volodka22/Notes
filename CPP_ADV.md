@@ -306,3 +306,82 @@ void f(T... args) {
   g(z(args)....); // g(z(arg0), z(arg1), ...)
 }
 ```
+
+### trailing return type
+
+```
+char f(int&);
+std::string f(std::string);
+
+??? g(T&& x) {
+  return f(std::forward<T>(x));
+}
+```
+
+Два решения:
+```
+template<class T>
+T&& declval() noexcept;
+
+template<typename T>
+decltype(f(declval<T>())) g(T&& x) {
+  return f(std::forward<T>(x));
+}
+```
+
+Идея -> то что внутри decltype() не вычисляется, как и sizeof()
+
+```
+template<typename T>
+auto g(T&& x) -> decltype(f(std::forward<T>(x))) {
+  return f(std::forward<T>(x));
+}
+```
+
+Использовать новый синтаксис
+
+ИЛИ новейший
+
+```
+template<typename T>
+decltype(auto) g(T&& x) {
+  return f(std::forward<T>(x));
+}
+```
+
+## Статический и динамеческий полиморфизм
+
+Статический:
+```
+template <typename T> 
+struct less {
+  bool operator()(T const & a, T const& b) const {
+    return a < b;
+  }
+}
+```
+Динамический:
+```
+bool int_less(int a, int b) {
+  return a < b;
+}
+```
+
+Статически компаратор предсказывается куда лучше, поэтому быстрее. Но можем получить много копий одного объекта в некоторых случаях
+
+## Лямбды
+
+```
+int x, y, z;
+[x, &y, z](){}
+[=, &y](){}
+[&,x](){}
+[=](){}
+[&](){}
+```
+[&] и [=] значат - забрать все клнтекстные переменные по ссылке/значению
+
+```
+[]<typename T>(T a, T b) { return a < b; }; // можно использовать template
+[](auto a, auto b) {...} // а можно auto (можно использовать и в функциях)
+```
