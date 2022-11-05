@@ -467,3 +467,40 @@ FNOP
 ## Время
 
 rdtscp - указывает кол-во базовых тактов прошедших с начала включения процессора. 
+
+## x86-64/x64/AMD64 (!= IA64)
+
+Новые регистры: r8..r15 (подрегистры: r8b (byte), r8d(dword), r8q )
+Нельзя использовать вместе
+
+Адресс [rax,rbx...r15 + все регистры без rsp * 1,2,4,8 + offset32 (с положительным знаком)]
+ИЛИ RIP
+
+Нельзя использовать 64битные константы
+
+mov ebx, [rel метка]
+ИЛИ 
+default rel
+mov ebx, метка
+
+
+Были выкинуты: AA, AAD, AAM, AAS, DAA, DAS/ BOUND, INTO/ LDS, LES/ SALC/ pusha, popa/ push, pop от seg/ jmp, call far abs/ ARPL -> movsxd (делает из 32 бит 64)/ short inc,dec (однобайтовая форма для регистров, теперь все интерпретируется в длинную 3байтовую форму)/ sysenter,sysexit -> syscall,sysret
+
+## конвенции в x64
+fastcall64 - для винды
+unix64 - для всего остального
+
+### fastcall64
+
+Параметры: rcx, rdx, r8, r9 ИЛИ xmm0...3
+Сохранять: rbx, rbp, rdi, r12-15, xmm6-15
+Фича     : 32 байта shadow space
+Перед тем как делать call rsp должен быть кратен 16
+Возвращаемое значение в rax, eax, al или xmm0
+
+### unix64
+
+Параметры: rdi, rsi, rdx, rcx -> r10(syscall), r8, r9 И xmm0..7. Для vararg нужно в rax положить кол-во xmm аргументов
+Сохранять: rbx, rbp, r12-r15
+Такое же правило для выравнивания
+Фича     : red zone (до rsp-128)
