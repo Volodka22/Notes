@@ -531,3 +531,14 @@ pcmpeq(b|w|d), pcmpgt(b|w|d) - пишет в первый регистр. есл
 pand, pandn, por, pxor
 psll(w|d|q), psrl(w|d|q), psra(w|d) - l - логические сдвиги, a - арифметические
 EMMS - очищает все регистры сопроцессора
+
+Пример: максимум (знаковый)
+```
+foo:
+        movq mm2, mm0
+        pcmpgt mm2, mm1
+        pand mm0, mm2
+        pandn mm2, mm1
+        por mm0, mm2
+
+```
