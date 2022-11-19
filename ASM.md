@@ -433,7 +433,7 @@ table: dd L2,L0,L1,L2,L1
 
 FLD/FILD/FBLD
 
-FST(P)/FIST(P)/FBST(P) -> p == push
+FST(P)/FIST(P)/FBST(P) -> p == pop
 
 FLDZ/FLD1/FLDPI
 
