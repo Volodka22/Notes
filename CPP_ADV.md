@@ -397,3 +397,35 @@ int x, y, z;
 Есть еще constinit - это как constexpr, только не делает переменную константной. 
 
 Еще есть consteval - для вычиления только во время компиляции (нигде не используется, кроме одной функции в библиотеке).
+
+## Концепты
+
+В первую очередь придуманы, чтобы сделать понятней ошибки при компиляции у функций с шаблонными параметрами. Во вторую сильно упрощают написание некоторых штук, а также несколько быстрее SFINAE.
+
+**Примеры:**
+
+```
+template <typename T>
+concept destructible = std::is_nothrow_destructible_v<T>;
+
+template <typename T>
+requires destructible<T>
+void foo(T&) {}
+
+template <destructible T>
+void bar(T&) {}
+
+void baz(destructible auto&) {}
+```
+Все три функции эквивалентны.
+
+Сравниваются концепты между собой через приведение к нормальной форме. Должны ссылаться на один и тот же концепт для равенства.
+
+```
+template <typename U, typename V>
+concept half_same_as = std::is_same_v<U, V>;
+
+
+template <typename U, typename V>
+concept same_as = half_same_as<U, V> && half_same_as<V, U>;
+```
