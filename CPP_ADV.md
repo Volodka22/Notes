@@ -429,3 +429,57 @@ concept half_same_as = std::is_same_v<U, V>;
 template <typename U, typename V>
 concept same_as = half_same_as<U, V> && half_same_as<V, U>;
 ```
+
+## Многопоточность
+
+```
+#include <thread>
+
+int main() {
+  thread th([] {
+    std::cout << "H";
+  });
+  
+  th.join(); // -> запустить
+  // th.detach(); -> запустить без привязки к имени
+  
+}
+```
+
+### мьютексы
+
+```
+#include <mutex>
+
+std::mutex m;
+
+int f() {
+  m.lock();
+  // крит секция
+  m.unlock();
+}
+```
+
+Есть обертка std::lock_guard lock(mutex). Она вызывает unlock() в своем деструкторе (помогает с пробрасыванием ошибок)
+
+Также есть recursive_mutex, которая позволяет одному потоку несколько раз залочить один и тот же тред (но анлокоа после должно быть столько же)
+
+###  std::condition_variable
+
+```
+ std::condition_variable cv;
+
+void push(T x) {
+  std::lock_guard lock(m)
+  // ...
+  cv.notify_one();
+}
+
+T pop(T x) {
+  std::unique_lock lock(m); // можно лочить и анлочить назад
+  cv.wait(lock, [] { return !q.empty() });
+  
+  // ...
+}
+
+```
